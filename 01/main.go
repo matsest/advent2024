@@ -46,17 +46,15 @@ func p1(input []string) int {
 		d := int(math.Abs(float64(nums1[i] - nums2[i])))
 		distance += d
 	}
-
 	return distance
 }
 
 func p2(input []string) int {
 	similarities := 0
 	nums1, nums2 := getNumbers(input)
-
 	appears := make(map[int]int) // map to save appearances
-	for _, v := range nums1 {
 
+	for _, v := range nums1 {
 		a, err := appears[v] // check map first
 		if !err {
 			a = findInSlice(v, nums2)
@@ -65,7 +63,6 @@ func p2(input []string) int {
 		// fmt.Println(v, a)
 		similarities += v * a
 	}
-
 	return similarities
 }
 
