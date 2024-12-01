@@ -52,9 +52,10 @@ function Invoke-Part2 {
     #Write-Host "nums1: $($nums1 -join ",")"
     #Write-Host "nums2: $($nums2 -join ",")"
     [int]$similarities = 0
-    $counts = $nums2 | Group-Object
+    $ht = @{}
+    $nums2 | Group-Object | ForEach-Object { $ht.Add([int]$_.Name, [int]$_.Count)}
     for ($i = 0; $i -lt $nums1.Count; $i++) {
-        [int]$a = $counts | Where-Object Name -eq $nums1[$i] | Select-Object -ExpandProperty "Count"
+        [int]$a = $ht[$nums1[$i]] ?? 0
         $similarities += $($nums1[$i]) * $a
     }
 
