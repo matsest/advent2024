@@ -18,6 +18,17 @@ tasks:
         cd ..
         echo
 
+  run-ps:
+    desc: "Run PowerShell solution for a day with CLI argument. Example: task run-ps -- 01"
+    silent: true
+    cmds:
+      - |
+        echo "day {{.CLI_ARGS}}"
+        cd "{{.CLI_ARGS}}"
+        pwsh -f ./main.ps1 -Solve
+        cd ..
+        echo
+
   test:
     desc: "Test solution for a day with CLI argument. Example: task run -- 01"
     silent: true
@@ -26,6 +37,17 @@ tasks:
         echo "day {{.CLI_ARGS}}"
         cd "{{.CLI_ARGS}}"
         go test -v
+        cd ..
+        echo
+
+  test-ps:
+    desc: "Test PowerShell solution for a day with CLI argument. Example: task test-ps -- 01"
+    silent: true
+    cmds:
+      - |
+        echo "day {{.CLI_ARGS}}"
+        cd "{{.CLI_ARGS}}"
+        pwsh -C "Invoke-Pester"
         cd ..
         echo
 
