@@ -1,0 +1,45 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Print available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  run:
+    desc: "Run solution for a day with CLI argument. Example: task run -- 01"
+    silent: true
+    cmds:
+      - |
+        echo "day {{.CLI_ARGS}}"
+        cd "{{.CLI_ARGS}}"
+        go run main.go
+        cd ..
+        echo
+
+  test:
+    desc: "Test solution for a day with CLI argument. Example: task run -- 01"
+    silent: true
+    cmds:
+      - |
+        echo "day {{.CLI_ARGS}}"
+        cd "{{.CLI_ARGS}}"
+        go test -v
+        cd ..
+        echo
+
+  run-all:
+    desc: Run solutions for all days
+    silent: true
+    cmds:
+      - |
+        for d in $(seq -w 1 24); do
+          if [[ -d "$(pwd)/${d}" ]]; then
+            echo "day ${d}"
+            cd "${d}"
+            go run main.go
+            cd ..
+            echo
+          fi
+        done
