@@ -15,7 +15,7 @@ Describe 'Test-Report' {
     It 'mixed increasing/decreasing is unsafe' {
         Test-Report @(1, 3, 2, 4, 5) | Should -Be $False
     }
-    It 'no increase/decrease unsafe' {
+    It 'no increase/decrease is unsafe' {
         Test-Report @(8, 6, 4, 4, 1) | Should -Be $False
     }
 }

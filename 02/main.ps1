@@ -28,7 +28,7 @@ function Test-Report {
         [int]$MinDiff = 1,
         [int]$MaxDiff = 3
     )
-    Write-Debug "$Report"
+    Write-Debug "`n$Report"
     
     # check if all increasing or all decreasing
     $increasing = $Report | Sort-Object
@@ -46,7 +46,6 @@ function Test-Report {
         Write-Debug "is decreasing?"
         $isSafe = $true
     }
-    
     else {
         return $false
     }
