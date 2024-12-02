@@ -29,20 +29,23 @@ function Test-Report {
         [int]$MaxDiff = 3
     )
     Write-Debug "`n$Report"
-    
-    # check if all increasing or all decreasing
-    $increasing = $Report | Sort-Object
-    $decreasing = $Report | Sort-Object -Descending
+
+    # check if report does not have duplicate levels
     if (($Report | Select-Object -Unique).Length -lt $Report.Length) {
         Write-Debug "Contains duplicates"
         return $false
     }
 
-    if (!(Compare-Object -ReferenceObject $Report -DifferenceObject $increasing -PassThru -SyncWindow 0)) {
+    # check if all levels are increasing or decreasing
+    [string]$increasing = ($Report | Sort-Object) -join " "
+    [string]$decreasing = ($Report | Sort-Object -Descending) -join " "
+    [string]$reportAsString = $Report -join " "
+
+    if ($reportAsString -eq $increasing) {
         Write-Debug "is increasing?"
         $isSafe = $true
     }
-    elseif (!(Compare-Object -ReferenceObject $Report -DifferenceObject $decreasing -PassThru -SyncWindow 0)) {
+    elseif ($reportAsString -eq $decreasing) {
         Write-Debug "is decreasing?"
         $isSafe = $true
     }
@@ -50,7 +53,7 @@ function Test-Report {
         return $false
     }
 
-    # check diffs
+    # check if diffs are within bounds
     for ($i = 0; $i -lt $Report.Count - 1; $i++) {
         $diff = [Math]::Abs($Report[$i + 1] - $Report[$i])
         Write-Debug "diff: $diff"
@@ -72,7 +75,7 @@ function Invoke-Part1 {
     foreach ($report in $reports) {
         $isSafe = Test-Report $Report
         if ($isSafe) {
-            $safeReports += 1 
+            $safeReports += 1
         }
     }
 
@@ -88,15 +91,19 @@ function Invoke-Part2 {
     foreach ($report in $reports) {
         $isSafe = Test-Report $Report
         if ($isSafe) {
-            $safeReports += 1 
-        } else {
+            $safeReports += 1
+        }
+        else {
             # Check alternates
-            for ($i = 0; $i -lt $report.Count; $i++) {
-                $copy = [System.Collections.ArrayList]@()
-                $copy.AddRange($report) | Out-Null
-                $copy.RemoveAt($i) | Out-Null
+            for ($i = 0; $i -lt $report.Count - 1; $i++) {
+                $copy = if ($i -eq 0) {
+                    [int[]]$report[1..($Report.Count - 1)]
+                }
+                else {
+                    [int[]]$report[0..($i - 1)] + [int[]]$report[($i + 1)..($report.Count - 1)]
+                }
                 $isSafe = Test-Report $copy
-                if($isSafe){
+                if ($isSafe) {
                     $safeReports += 1
                     break
                 }
