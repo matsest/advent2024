@@ -37,10 +37,8 @@ func findInSlice(n int, nums []int) (appears int) {
 func p1(input []string) int {
 	distance := 0
 	nums1, nums2 := getNumbers(input)
-	//fmt.Println("initial", nums1, nums2)
 	slices.Sort(nums1)
 	slices.Sort(nums2)
-	//fmt.Println("sorted", nums1, nums2)
 
 	for i := range nums1 {
 		d := int(math.Abs(float64(nums1[i] - nums2[i])))
@@ -60,7 +58,6 @@ func p2(input []string) int {
 			a = findInSlice(v, nums2)
 			appears[v] = a
 		}
-		// fmt.Println(v, a)
 		similarities += v * a
 	}
 	return similarities
