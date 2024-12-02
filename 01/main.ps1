@@ -17,7 +17,7 @@ function Get-Numbers {
     $lines = Get-Content -Path $Path
     foreach ($line in $lines) {
         $parts = $line -split "\s+"
-        #Write-Host "$($parts[0]), $($parts[1])"
+        Write-Debug "$($parts[0]), $($parts[1])"
         $nums1.Add([int]$parts[0]) | Out-Null
         $nums2.Add([int]$parts[1]) | Out-Null
     }
@@ -34,8 +34,8 @@ function Invoke-Part1 {
         [string]$Path
     )
     $nums1, $nums2 = Get-Numbers -Path $Path -Sort
-    #Write-Host "nums1: $($nums1 -join ",")"
-    #Write-Host "nums2: $($nums2 -join ",")"
+    Write-Debug "nums1: $($nums1 -join ",")"
+    Write-Debug "nums2: $($nums2 -join ",")"
     $distance = 0
     for ($i = 0; $i -lt $nums1.Count; $i++) {
         $distance += [Math]::Abs($nums1[$i] - $nums2[$i])
@@ -49,8 +49,8 @@ function Invoke-Part2 {
         [string]$Path
     )
     $nums1, $nums2 = Get-Numbers -Path $Path
-    #Write-Host "nums1: $($nums1 -join ",")"
-    #Write-Host "nums2: $($nums2 -join ",")"
+    Write-Debug "nums1: $($nums1 -join ",")"
+    Write-Debug "nums2: $($nums2 -join ",")"
     [int]$similarities = 0
     $ht = @{}
     $nums2 | Group-Object | ForEach-Object { $ht.Add([int]$_.Name, [int]$_.Count)}
