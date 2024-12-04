@@ -75,39 +75,61 @@ function Invoke-Part1 {
     $sum
 }
 
+function Test-Corners {
+    param(
+        [string[]]$Content,
+        [int]$Row,
+        [int]$Col,
+        [string]$TopLeft,
+        [string]$BottomLeft,
+        [string]$TopRight,
+        [string]$BottomRight
+    )
+    $i = $Row
+    $j = $Col
+    if ($content[$i - 1][$j - 1] -eq $TopLeft -and $content[$i + 1][$j - 1] -eq $BottomLeft -and $content[$i - 1][$j + 1] -eq $TopRight -and $content[$i + 1][$j + 1] -eq $BottomRight) {
+        $true
+    }
+    $false
+}
+
 function Invoke-Part2 {
     param (
         [string]$Path
     )
     [string[]]$content = Get-Content -Path $Path
 
-    # loop through each inner element and check corners for the 4 valid configurations of a MAS cross
+    $configurationsToTest = @(
+        #option 1
+        # M S
+        #  A
+        # M S
+        'MMSS',
+        #option 2
+        # M M
+        #  A
+        # S S
+        'MSMS'
+        #option 3
+        # S S
+        #  A
+        # M M
+        'SMSM'
+        #option 4
+        # S M
+        #  A
+        # S M
+        'SSMM'
+    )
+
+    # loop through each inner element and check corners for the 4 valid configurations of a cross-MAS
     for ($i = 1; $i -lt $content.Length - 1; $i++) {
         for ($j = 1; $j -lt $content[0].Length - 1; $j++) {
             if ($content[$i][$j] -eq 'A') {
-                #option 1
-                # M S
-                # M S
-                if ($content[$i - 1][$j - 1] -eq 'M' -and $content[$i + 1][$j - 1] -eq 'M' -and $content[$i - 1][$j + 1] -eq 'S' -and $content[$i + 1][$j + 1] -eq 'S') {
-                    $sum += 1
-                }
-                #option 2
-                # M M
-                # S S
-                elseif ($content[$i - 1][$j - 1] -eq 'M' -and $content[$i + 1][$j - 1] -eq 'S' -and $content[$i - 1][$j + 1] -eq 'M' -and $content[$i + 1][$j + 1] -eq 'S') {
-                    $sum += 1
-                }
-                #option 3
-                # S S
-                # M M
-                elseif ($content[$i - 1][$j - 1] -eq 'S' -and $content[$i + 1][$j - 1] -eq 'M' -and $content[$i - 1][$j + 1] -eq 'S' -and $content[$i + 1][$j + 1] -eq 'M') {
-                    $sum += 1
-                }
-                #option 4
-                # S M
-                # S M
-                elseif ($content[$i - 1][$j - 1] -eq 'S' -and $content[$i + 1][$j - 1] -eq 'S' -and $content[$i - 1][$j + 1] -eq 'M' -and $content[$i + 1][$j + 1] -eq 'M') {
-                    $sum += 1
+                foreach ($c in $configurationsToTest) {
+                    if (Test-Corners -Content $content -Row $i -Col $j -TopLeft $c[0] -BottomLeft $c[1] -TopRight $c[2] -BottomRight $c[3] ) {
+                        $sum += 1
+                    }
                 }
             }
         }
