@@ -9,7 +9,7 @@ Describe 'Part 1' {
 }
 
 Describe 'Part 2' {
-    It 'matches expected output (4)' {
+    It 'matches expected output (48)' {
         Invoke-Part2 -Path "test2.txt" | Should -Be 48
     }
 }
