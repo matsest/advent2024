@@ -22,35 +22,19 @@ function Test-Order {
         [int[]]$Update,
         [hashtable]$Rules
     )
-    for ($i = 0; $i -lt $parts.Length; $i++) {
-        if ($rules.ContainsKey($parts[$i])) {
-            $isValid = $true
-            # check forwards
-            if ($i -lt $parts.Length - 1) {
-                foreach ($part in $parts[($i + 1)..$parts.Length]) {
-                    if ($rules[$parts[$i]] -notcontains $part) {
-                        $isValid = $false
-                        #Write-Host -ForegroundColor Red "FWD NOT VALID. [$part]: Does not contain rule $($rules[$parts[$i]] -join ',')"
-                        break
+    $isOk = $true
+    foreach ($rule in $rules.GetEnumerator()) {
+        if ($rule.Key -in $Update) {
+            foreach ($val in $rule.Value) {
+                if ($val -in $Update) {
+                    if ($Update.IndexOf($val) -lt $Update.IndexOf($rule.Key)) {
+                        $isOk = $false
                     }
                 }
-            }
-            # check backwards
-            if ($i -gt 0 -and $isValid) {
-                foreach ($part in $parts[($i - 1)..0]) {
-                    if ($rules[$parts[$i]] -contains $part) {
-                        $isValid = $false
-                        #Write-Host -ForegroundColor Red "BWD NOT VALID. [$part]: Does not contain rule $($rules[$parts[$i]] -join ',')"
-                        break
-                    }
-                }
-            }
-            if (!$isValid) {
-                break
             }
         }
     }
-    if ($isValid) {
+    if ($isOk) {
         return $true
     }
     $false
@@ -75,12 +59,10 @@ function Invoke-Part1 {
 
     foreach ($line in $updates) {
         [int[]]$parts = $line.Split(',')
-        #Write-Host -Foregroundcolor Green "`n >>> Checking $($parts -join ',')"
         $isValid = Test-Order -Update $parts -Rules $rules
         if ($isValid) {
             $middle = Get-MiddleElement -Array $parts
             $sum += $middle
-            #Write-Host "Is VALID! Middle: $middle for $($parts -join ','). Sum: $sum"
         }
     }
     $sum
@@ -99,23 +81,38 @@ function Invoke-Part2 {
 
     foreach ($line in $updates) {
         [int[]]$parts = $line.Split(',')
-        #Write-Host -Foregroundcolor Green "`n >>> Checking $($parts -join ',')"
         $isValid = Test-Order -Update $parts -Rules $rules
         if (!$isValid) {
-            Write-Host -Foregroundcolor Green "`n >>> Incorrect $($parts -join ',')"
-            # todo find corrected parts
-            #$partsCorrected = @() # TODO
-            #$middle = Get-MiddleElement -Array $partsCorrected
-            #$sum += $middle
-            #Write-Host "Is VALID! Middle: $middle for $($parts -join ','). Sum: $sum"
+            #Write-Host "Invalid order: $line"
+            while (!$isValid) {
+                for ($i = 0; $i -lt $parts.Length - 1; $i++) {
+                    for ($j = $i + 1; $j -lt $parts.Length; $j++) {
+                        if ($rules[$parts[$j]] -contains $parts[$i]) {
+                            # generate new order and test if valid
+                            $newOrder = $parts.Clone()
+                            $newOrder[$i] = $parts[$j]
+                            $newOrder[$j] = $parts[$i]
+                            #Write-Host "New order: $newOrder"
+                            $isValid = Test-Order -Update $newOrder -Rules $rules
+                            if ($isValid) {
+                                #Write-Host -ForegroundColor Green "IS VALID"
+                                $middle = Get-MiddleElement -Array $newOrder
+                                $sum += $middle
+                                break
+                            }
+                            else {
+                                $parts = $newOrder
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     $sum
-
 }
-
 
 if ($Solve) {
     Invoke-Part1 -Path "input1.txt", "input2.txt"
-    #Invoke-Part2 -Path "test1.txt", "test2.txt"
+    Invoke-Part2 -Path "input1.txt", "input2.txt"
 }
